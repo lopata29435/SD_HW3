@@ -6,7 +6,7 @@ spring:
     name: order-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/order_db
+    url: jdbc:postgresql://order-db:5432/order_db
     username: order_user
     password: order_password
     driver-class-name: org.postgresql.Driver
@@ -20,7 +20,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   rabbitmq:
-    host: localhost
+    host: rabbitmq
     port: 5672
     username: rabbit_user
     password: rabbit_password
@@ -43,7 +43,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eureka-server:8761/eureka/
   instance:
     prefer-ip-address: true
 
@@ -53,4 +53,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     config-url: /order/v3/api-docs/swagger-config
-    url: http://localhost:8080/order/v3/api-docs
+    url: /order/v3/api-docs
