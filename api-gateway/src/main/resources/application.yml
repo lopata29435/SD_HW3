@@ -1,0 +1,58 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+          routes:
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/payment/**
+              filters:
+                - RewritePath=/payment/(?<segment>.*), /${segment}
+                - AddRequestHeader=X-Forwarded-Prefix, /payment
+
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/order/**
+              filters:
+                - RewritePath=/order/(?<segment>.*), /${segment}
+                - AddRequestHeader=X-Forwarded-Prefix, /order
+
+            - id: payment-service-swagger
+              uri: lb://payment-service
+              predicates:
+                - Path=/payment/swagger-ui/**, /payment/webjars/**, /payment/v3/api-docs/**
+              filters:
+                - RewritePath=/payment/(?<segment>.*), /${segment}
+                - AddRequestHeader=X-Forwarded-Prefix, /payment
+
+            - id: order-service-swagger
+              uri: lb://order-service
+              predicates:
+                - Path=/order/swagger-ui/**, /order/webjars/**, /order/v3/api-docs/**
+              filters:
+                - RewritePath=/order/(?<segment>.*), /${segment}
+                - AddRequestHeader=X-Forwarded-Prefix, /order
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.netty: DEBUG
