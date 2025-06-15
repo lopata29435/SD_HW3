@@ -40,6 +40,9 @@ class OrderServiceTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private OrderService orderService;
 
@@ -68,13 +71,15 @@ class OrderServiceTest {
 
         Order result = orderService.createOrder(userId, amount);
 
+        verify(orderRepository, times(2)).save(any(Order.class));
+        verify(rabbitTemplate).convertAndSend(eq("payment.exchange"), eq("payment.task"), any(Object.class));
+        verify(notificationService).sendOrderStatusNotification(eq(order.getId()), eq(OrderStatus.CREATED));
+        verify(notificationService).sendOrderStatusNotification(eq(order.getId()), eq(OrderStatus.PAYMENT_PENDING));
         assertNotNull(result);
         assertEquals(userId, result.getUserId());
         assertEquals(amount, result.getAmount());
         assertEquals(OrderStatus.PAYMENT_PENDING, result.getStatus());
         verify(restTemplate).getForObject(anyString(), eq(Boolean.class), eq(userId));
-        verify(orderRepository).save(any(Order.class));
-        verify(rabbitTemplate).convertAndSend(eq("payment.exchange"), eq("payment.task"), any(Object.class));
     }
 
     @Test
@@ -126,6 +131,7 @@ class OrderServiceTest {
         assertEquals(OrderStatus.PAID, order.getStatus());
         verify(orderRepository).findByIdWithLock(orderId);
         verify(orderRepository).save(order);
+        verify(notificationService).sendOrderStatusNotification(eq(orderId), eq(OrderStatus.PAID));
     }
 
     @Test
@@ -138,6 +144,7 @@ class OrderServiceTest {
         assertEquals(OrderStatus.PAYMENT_FAILED, order.getStatus());
         verify(orderRepository).findByIdWithLock(orderId);
         verify(orderRepository).save(order);
+        verify(notificationService).sendOrderStatusNotification(eq(orderId), eq(OrderStatus.PAYMENT_FAILED));
     }
 
     @Test

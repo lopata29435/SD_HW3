@@ -6,44 +6,66 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            maxAge: 3600
       server:
         webflux:
           discovery:
             locator:
               enabled: true
               lower-case-service-id: true
-          routes:
-            - id: payment-service
-              uri: lb://payment-service
-              predicates:
-                - Path=/payment/**
-              filters:
-                - RewritePath=/payment/(?<segment>.*), /${segment}
-                - AddRequestHeader=X-Forwarded-Prefix, /payment
+      routes:
+        - id: order-service-websocket
+          uri: lb://order-service
+          predicates:
+            - Path=/ws/**
+          filters:
+            - RewritePath=/ws/(?<segment>.*), /${segment}
 
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/order/**
-              filters:
-                - RewritePath=/order/(?<segment>.*), /${segment}
-                - AddRequestHeader=X-Forwarded-Prefix, /order
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/payment/**
+          filters:
+            - RewritePath=/payment/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /payment
 
-            - id: payment-service-swagger
-              uri: lb://payment-service
-              predicates:
-                - Path=/payment/swagger-ui/**, /payment/webjars/**, /payment/v3/api-docs/**
-              filters:
-                - RewritePath=/payment/(?<segment>.*), /${segment}
-                - AddRequestHeader=X-Forwarded-Prefix, /payment
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/order/**
+          filters:
+            - RewritePath=/order/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /order
 
-            - id: order-service-swagger
-              uri: lb://order-service
-              predicates:
-                - Path=/order/swagger-ui/**, /order/webjars/**, /order/v3/api-docs/**
-              filters:
-                - RewritePath=/order/(?<segment>.*), /${segment}
-                - AddRequestHeader=X-Forwarded-Prefix, /order
+        - id: payment-service-swagger
+          uri: lb://payment-service
+          predicates:
+            - Path=/payment/swagger-ui/**, /payment/webjars/**, /payment/v3/api-docs/**
+          filters:
+            - RewritePath=/payment/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /payment
+
+        - id: order-service-swagger
+          uri: lb://order-service
+          predicates:
+            - Path=/order/swagger-ui/**, /order/webjars/**, /order/v3/api-docs/**
+          filters:
+            - RewritePath=/order/(?<segment>.*), /${segment}
+            - AddRequestHeader=X-Forwarded-Prefix, /order
 
 eureka:
   client:
