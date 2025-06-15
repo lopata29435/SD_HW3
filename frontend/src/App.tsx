@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { 
@@ -16,7 +16,8 @@ import {
   DialogContent,
   DialogActions,
   Snackbar,
-  Alert
+  Alert,
+  Grid
 } from '@mui/material';
 
 interface Order {
@@ -240,155 +241,217 @@ function App() {
 
   if (!isLoggedIn) {
     return (
-      <Container maxWidth="sm">
-        <Box sx={{ mt: 4, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Вход в систему
-          </Typography>
-          <TextField
-            label="ID пользователя"
-            value={inputUserId}
-            onChange={(e) => setInputUserId(e.target.value)}
-            fullWidth
-            margin="normal"
-          />
-          <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-            <Button variant="contained" onClick={handleLogin}>
-              Войти
-            </Button>
-            <Button variant="outlined" onClick={handleCreateAccount}>
-              Создать аккаунт
-            </Button>
-          </Box>
-        </Box>
-        <Snackbar open={!!notification} autoHideDuration={6000} onClose={handleCloseNotification}>
-          <Alert onClose={handleCloseNotification} severity={notification?.severity}>
-            {notification?.message}
-          </Alert>
-        </Snackbar>
-      </Container>
+      <Box sx={{ 
+        minHeight: '100vh',
+        backgroundImage: 'url("/background.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative'
+      }}>
+        <Box sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1
+        }} />
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, py: 4 }}>
+          <Paper elevation={3} sx={{ p: 4, maxWidth: 400, mx: 'auto', mt: 8, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: '#1976d2' }}>
+              Вход в систему
+            </Typography>
+            <TextField
+              fullWidth
+              label="ID пользователя"
+              value={inputUserId}
+              onChange={(e) => setInputUserId(e.target.value)}
+              margin="normal"
+            />
+            <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleLogin}
+                sx={{ 
+                  backgroundColor: '#1976d2',
+                  '&:hover': {
+                    backgroundColor: '#1565c0'
+                  }
+                }}
+              >
+                Войти
+              </Button>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleCreateAccount}
+                sx={{ 
+                  borderColor: '#1976d2',
+                  color: '#1976d2',
+                  '&:hover': {
+                    borderColor: '#1565c0',
+                    backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                  }
+                }}
+              >
+                Создать аккаунт
+              </Button>
+            </Box>
+          </Paper>
+
+          {notification && (
+            <Snackbar
+              open={!!notification}
+              autoHideDuration={6000}
+              onClose={() => setNotification(null)}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <Alert onClose={() => setNotification(null)} severity={notification.severity}>
+                {notification.message}
+              </Alert>
+            </Snackbar>
+          )}
+        </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Система заказов
-        </Typography>
-        
-        <Paper sx={{ p: 2, mb: 2, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-          <Typography variant="h6" gutterBottom>
-            ID пользователя: {userId}
+    <Box sx={{ 
+      minHeight: '100vh',
+      backgroundImage: 'url("/background.png")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      position: 'relative'
+    }}>
+      <Box sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 1
+      }} />
+      <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2, py: 4 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+          <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: '#1976d2' }}>
+            Личный кабинет
           </Typography>
-          <Typography variant="h6">
-            Баланс: {balance} ₽
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6" sx={{ color: '#1976d2' }}>
+              ID пользователя: {userId}
+            </Typography>
+            <Typography variant="h6" sx={{ color: '#1976d2' }}>
+              Баланс: {balance} ₽
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+            <Button
+              variant="contained"
+              onClick={() => setIsOrderDialogOpen(true)}
+              sx={{ 
+                backgroundColor: '#1976d2',
+                '&:hover': {
+                  backgroundColor: '#1565c0'
+                }
+              }}
+            >
+              Создать заказ
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setIsDepositDialogOpen(true)}
+              sx={{ 
+                borderColor: '#1976d2',
+                color: '#1976d2',
+                '&:hover': {
+                  borderColor: '#1565c0',
+                  backgroundColor: 'rgba(25, 118, 210, 0.04)'
+                }
+              }}
+            >
+              Пополнить баланс
+            </Button>
+          </Box>
         </Paper>
 
-        <Box sx={{ mb: 2 }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => setIsOrderDialogOpen(true)}
-            sx={{ mr: 2 }}
-          >
-            Создать заказ
-          </Button>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            onClick={() => setIsDepositDialogOpen(true)}
-          >
-            Пополнить баланс
-          </Button>
-        </Box>
-
-        <Typography variant="h5" gutterBottom>
-          Мои заказы
-        </Typography>
-        {orders.length === 0 ? (
-          <Typography>У вас пока нет заказов</Typography>
-        ) : (
-          <List>
+        <Paper elevation={3} sx={{ p: 3, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
+          <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#1976d2' }}>
+            Мои заказы
+          </Typography>
+          <Grid container spacing={3}>
             {orders.map((order) => (
-              <Paper key={order.id} sx={{ mb: 2, p: 2 }}>
-                <ListItem>
-                  <ListItemText
-                    primary={`Заказ #${order.id}`}
-                    secondary={
-                      <>
-                        <Typography component="span" variant="body2">
-                          Сумма: {order.amount} ₽
-                        </Typography>
-                        <br />
-                        <Typography component="span" variant="body2">
-                          Статус: {order.status}
-                        </Typography>
-                        <br />
-                        <Typography component="span" variant="body2">
-                          Создан: {new Date(order.createdAt).toLocaleString()}
-                        </Typography>
-                      </>
-                    }
-                  />
-                </ListItem>
-              </Paper>
+              <Grid item xs={12} sm={6} md={4} key={order.id}>
+                <Paper elevation={2} sx={{ p: 2, height: '100%', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
+                  <Typography variant="h6" gutterBottom sx={{ color: '#1976d2' }}>
+                    Заказ #{order.id}
+                  </Typography>
+                  <Typography>Статус: {order.status}</Typography>
+                  <Typography>Сумма: {order.amount} ₽</Typography>
+                  <Typography>Дата: {new Date(order.createdAt).toLocaleString()}</Typography>
+                </Paper>
+              </Grid>
             ))}
-          </List>
+          </Grid>
+        </Paper>
+
+        <Dialog open={isOrderDialogOpen} onClose={() => setIsOrderDialogOpen(false)}>
+          <DialogTitle>Создать заказ</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Сумма заказа"
+              type="number"
+              fullWidth
+              value={orderAmount}
+              onChange={(e) => setOrderAmount(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsOrderDialogOpen(false)}>Отмена</Button>
+            <Button onClick={handleCreateOrder} variant="contained">Создать</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={isDepositDialogOpen} onClose={() => setIsDepositDialogOpen(false)}>
+          <DialogTitle>Пополнить баланс</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Сумма пополнения"
+              type="number"
+              fullWidth
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsDepositDialogOpen(false)}>Отмена</Button>
+            <Button onClick={handleDeposit} variant="contained">Пополнить</Button>
+          </DialogActions>
+        </Dialog>
+
+        {notification && (
+          <Snackbar
+            open={!!notification}
+            autoHideDuration={6000}
+            onClose={() => setNotification(null)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <Alert onClose={() => setNotification(null)} severity={notification.severity}>
+              {notification.message}
+            </Alert>
+          </Snackbar>
         )}
-      </Box>
-
-      <Dialog open={isOrderDialogOpen} onClose={() => setIsOrderDialogOpen(false)}>
-        <DialogTitle>Создать заказ</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Сумма заказа"
-            type="number"
-            fullWidth
-            value={orderAmount}
-            onChange={(e) => setOrderAmount(e.target.value)}
-            inputProps={{ min: "0", step: "0.01" }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsOrderDialogOpen(false)}>Отмена</Button>
-          <Button onClick={handleCreateOrder} variant="contained">
-            Создать
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={isDepositDialogOpen} onClose={() => setIsDepositDialogOpen(false)}>
-        <DialogTitle>Пополнить баланс</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Сумма пополнения"
-            type="number"
-            fullWidth
-            value={depositAmount}
-            onChange={(e) => setDepositAmount(e.target.value)}
-            inputProps={{ min: "0", step: "0.01" }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsDepositDialogOpen(false)}>Отмена</Button>
-          <Button onClick={handleDeposit} variant="contained">
-            Пополнить
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar open={!!notification} autoHideDuration={6000} onClose={handleCloseNotification}>
-        <Alert onClose={handleCloseNotification} severity={notification?.severity}>
-          {notification?.message}
-        </Alert>
-      </Snackbar>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 
